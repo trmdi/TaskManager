@@ -71,6 +71,8 @@ ColumnLayout {
     readonly property string artist: currentMetadata["xesam:artist"] || ""
     readonly property string albumArt: currentMetadata["mpris:artUrl"] || ""
 
+    width: isWin? units.gridUnit * 15 : undefined
+    height: isWin? width / 1.5 : undefined
     spacing: units.smallSpacing
 
     // launcher icon + text labels + close button
@@ -79,9 +81,7 @@ ColumnLayout {
         // match spacing of DefaultToolTip.qml in plasma-framework
         spacing: isWin ? units.smallSpacing : units.largeSpacing
 
-        // This number controls the overall size of the window tooltips
-        Layout.maximumWidth: units.gridUnit * 16
-        Layout.minimumWidth: isWin ? Layout.maximumWidth : 0
+        Layout.fillWidth: true
         Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
         // match margins of DefaultToolTip.qml in plasma-framework
         Layout.margins: isWin ? 0 : units.gridUnit / 2
@@ -171,8 +171,8 @@ ColumnLayout {
     Item {
         id: thumbnailSourceItem
 
-        Layout.minimumWidth: header.width
-        Layout.preferredHeight: header.width / 2
+        Layout.fillWidth: true
+        Layout.fillHeight: true
 
         visible: isWin
 
@@ -180,6 +180,38 @@ ColumnLayout {
         // TODO: this causes XCB error message when being visible the first time
         property int winId: isWin && windows[flatIndex] !== undefined ? windows[flatIndex] : 0
 
+        Item {
+            anchors.fill: parent
+
+            Image {
+                id: albumArtBackground
+                source: albumArt
+                anchors.fill: parent
+                fillMode: Image.PreserveAspectCrop
+                visible: false
+                smooth: true
+            }
+
+            BrightnessContrast {
+                id: layerBrightnessContrast
+                anchors.fill: albumArtBackground
+                visible: false
+                source: albumArtBackground
+                brightness: 0.25
+                contrast: -0.25
+            }
+
+            GaussianBlur {
+                anchors.fill: parent
+                anchors.margins: 1
+                visible: albumArtImage.available
+                source: layerBrightnessContrast
+                opacity: 0.8
+                radius: 50
+                samples: 101
+            }
+        }
+        
         // There's no PlasmaComponents3 version
         PlasmaComponents.Highlight {
             anchors.fill: hoverHandler
@@ -194,21 +226,6 @@ ColumnLayout {
 
             visible: !albumArtImage.visible && !thumbnailSourceItem.isMinimized
             winId: thumbnailSourceItem.winId
-        }
-
-        Image {
-            id: albumArtBackground
-            source: albumArt
-            anchors.fill: parent
-            fillMode: Image.PreserveAspectCrop
-            visible: albumArtImage.available
-            layer.enabled: true
-            opacity: 0.25
-            layer.effect: FastBlur {
-                source: albumArtBackground
-                anchors.fill: parent
-                radius: 30
-            }
         }
 
         Image {
@@ -249,15 +266,13 @@ ColumnLayout {
 
     // Player controls row
     RowLayout {
-        Layout.maximumWidth: header.width
+        Layout.fillWidth: true
 
         visible: hasPlayer
         enabled: canControl
 
         ColumnLayout {
             Layout.fillWidth: true
-            Layout.topMargin: units.smallSpacing
-            Layout.bottomMargin: units.smallSpacing
             spacing: 0
 
              ScrollableTextWrapper {
