@@ -318,16 +318,12 @@ ColumnLayout {
         PlasmaComponents3.ToolButton {
             enabled: canGoBack
             icon.name: LayoutMirroring.enabled ? "media-skip-forward" : "media-skip-backward"
-            icon.height: units.iconSizes.smallMedium
-            icon.width: units.iconSizes.smallMedium
             onClicked: mpris2Source.goPrevious(mprisSourceName)
         }
 
         PlasmaComponents3.ToolButton {
             enabled: playing ? canPause : canPlay
             icon.name: playing ? "media-playback-pause" : "media-playback-start"
-            icon.height: units.iconSizes.smallMedium
-            icon.width: units.iconSizes.smallMedium
             onClicked: {
                 if (!playing) {
                     mpris2Source.play(mprisSourceName);
@@ -340,8 +336,6 @@ ColumnLayout {
         PlasmaComponents3.ToolButton {
             enabled: canGoNext
             icon.name: LayoutMirroring.enabled ? "media-skip-backward" : "media-skip-forward"
-            icon.height: units.iconSizes.smallMedium
-            icon.width: units.iconSizes.smallMedium
             onClicked: mpris2Source.goNext(mprisSourceName)
         }
     }
